@@ -7,41 +7,21 @@ from views.todo_view import show_todo
 
 def create_main_window():
     root = tk.Tk()
-    root.title("Main Application")
+    root.title("Navigation Tool")
 
     menubar = tk.Menu(root)
-
-    def show_home_page():
-        show_home(main_frame)
-
-    def show_ino_tool_page():
-        show_ino_tool(main_frame)
-
-    def show_abbreviation_tool_page():
-        show_abbreviation_tool(main_frame)
-
-    def show_notepad_page():
-        show_notepad(main_frame)
-
-    def show_todo_page():
-        show_todo(main_frame)
-
-    menubar.add_command(label="Home", command=show_home_page)
-    menubar.add_command(label="INO Tool", command=show_ino_tool_page)
-    menubar.add_command(label="Abbreviation Tool", command=show_abbreviation_tool_page)
-    menubar.add_command(label="Notepad", command=show_notepad_page)
-    menubar.add_command(label="ToDo", command=show_todo_page)
-
     root.config(menu=menubar)
+
+    file_menu = tk.Menu(menubar, tearoff=0)
+    menubar.add_cascade(label="Menu", menu=file_menu)
+    file_menu.add_command(label="Home", command=lambda: show_home(root, main_frame))
+    file_menu.add_command(label="INO Tool", command=lambda: show_ino_tool(root, main_frame))
+    file_menu.add_command(label="Abbreviation Tool", command=lambda: show_abbreviation_tool(root, main_frame))
+    file_menu.add_command(label="Notepad", command=lambda: show_notepad(root, main_frame))
+    file_menu.add_command(label="ToDo", command=lambda: show_todo(root, main_frame))
 
     main_frame = tk.Frame(root)
     main_frame.pack(fill="both", expand=True)
 
-    # Show the home page by default
-    show_home_page()
-
-    return root
-
-if __name__ == "__main__":
-    root = create_main_window()
+    show_home(root, main_frame)
     root.mainloop()

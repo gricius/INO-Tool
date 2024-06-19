@@ -1,15 +1,21 @@
 import tkinter as tk
-import os
 
-def show_home(frame):
-    for widget in frame.winfo_children():
+def show_home(root, main_frame):
+    # Clear the main frame
+    for widget in main_frame.winfo_children():
         widget.destroy()
 
-    tk.Label(frame, text="Disclaimer: This application shall not be used for operations. Can be used only for testing purposes.").pack(pady=5)
-    tk.Label(frame, text="The following was updated recently:").pack(pady=5)
+    frame = tk.Frame(main_frame)
+    frame.pack(fill="both", expand=True)
 
-    news_file = os.path.join(os.path.dirname(__file__), '..', 'news.txt')
-    with open(news_file, 'r') as file:
-        news_content = file.read()
+    header = tk.Label(frame, text="Disclaimer: This application shall not be used for operations. Can be used only for testing purposes.", font=("Arial", 14))
+    header.pack(pady=10)
 
-    tk.Label(frame, text=news_content).pack(pady=5)
+    try:
+        with open("news.txt", "r") as file:
+            news_content = file.read()
+    except FileNotFoundError:
+        news_content = "No recent updates."
+
+    news_label = tk.Label(frame, text=f"The following was updated recently:\n\n{news_content}", justify=tk.LEFT, wraplength=600)
+    news_label.pack(pady=10)

@@ -1,46 +1,57 @@
 import tkinter as tk
-from tkinter import messagebox
+import json
 
-# Define a global variable to store the tasks
-todo_entries = ["Task 1", "Task 2", "Task 3"]  # Example entries; replace with actual loading logic
+todo_file = "todo.json"
 
-def show_todo(frame):
-    for widget in frame.winfo_children():
+def load_tasks():
+    try:
+        with open(todo_file, "r") as file:
+            tasks = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        tasks = []
+    return tasks
+
+def save_tasks(tasks):
+    with open(todo_file, "w") as file:
+        json.dump(tasks, file)
+
+def show_todo(root, main_frame):
+    # Clear the main frame
+    for widget in main_frame.winfo_children():
         widget.destroy()
 
-    tk.Label(frame, text="To-Do List").pack(pady=5)
+    frame = tk.Frame(main_frame)
+    frame.pack(fill="both", expand=True)
 
-    todo_listbox = tk.Listbox(frame, width=50, height=20)
-    todo_listbox.pack(pady=5)
+    tasks = load_tasks()
 
-    for entry in todo_entries:
-        todo_listbox.insert(tk.END, entry)
+    task_listbox = tk.Listbox(frame)
+    task_listbox.pack(fill="both", expand=True, padx=5, pady=5)
+
+    for task in tasks:
+        task_listbox.insert(tk.END, task)
 
     def add_task():
         task = task_entry.get()
         if task:
-            todo_listbox.insert(tk.END, task)
-            todo_entries.append(task)  # Add to the global list
+            task_listbox.insert(tk.END, task)
+            tasks.append(task)
+            save_tasks(tasks)
             task_entry.delete(0, tk.END)
-        else:
-            messagebox.showwarning("Input Error", "Please enter a task.")
 
     def remove_task():
-        try:
-            selected_task_index = todo_listbox.curselection()[0]
-            todo_listbox.delete(selected_task_index)
-            del todo_entries[selected_task_index]  # Remove from the global list
-        except IndexError:
-            messagebox.showwarning("Selection Error", "Please select a task to remove.")
+        selected_task_index = task_listbox.curselection()
+        if selected_task_index:
+            task = task_listbox.get(selected_task_index)
+            task_listbox.delete(selected_task_index)
+            tasks.remove(task)
+            save_tasks(tasks)
 
-    task_entry = tk.Entry(frame, width=50)
-    task_entry.pack(pady=5)
+    task_entry = tk.Entry(frame)
+    task_entry.pack(fill="x", padx=5, pady=5)
 
-    button_frame = tk.Frame(frame)
-    button_frame.pack(pady=5)
+    add_button = tk.Button(frame, text="Add Task", command=add_task)
+    add_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-    add_button = tk.Button(button_frame, text="Add Task", command=add_task)
-    add_button.pack(side=tk.LEFT, padx=5)
-
-    remove_button = tk.Button(button_frame, text="Remove Task", command=remove_task)
-    remove_button.pack(side=tk.LEFT, padx=5)
+    remove_button = tk.Button(frame, text="Remove Task", command=remove_task)
+    remove_button.pack(side=tk.LEFT, padx=5, pady=5)
